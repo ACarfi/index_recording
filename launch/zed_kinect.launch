@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2020, STEREOLABS.
+
+All rights reserved.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<launch>
+    <arg name="publish_urdf"         default="true" />
+    <arg name="experiment_name"	     default="prova" />
+
+    <!-- ZED2 CAMERA 1 -->
+    <arg name="node_name_1"          default="zed_node_A" />
+    <arg name="camera_model_1"       default="zed2" />    
+    <arg name="camera_name_1"        default="zedA" />
+    <arg name="cam_pos_x_1"          default="0.0" /> <!-- Position respect to base frame (i.e. "base_link) -->
+    <arg name="cam_pos_y_1"          default="0.0" /> <!-- Position respect to base frame (i.e. "base_link) -->
+    <arg name="cam_pos_z_1"          default="0.0" /> <!-- Position respect to base frame (i.e. "base_link) -->
+    <arg name="cam_roll_1"           default="0.0" /> <!-- Orientation respect to base frame (i.e. "base_link) -->
+    <arg name="cam_pitch_1"          default="0.0" /> <!-- Orientation respect to base frame (i.e. "base_link) -->
+    <arg name="cam_yaw_1"            default="0.0" /> <!-- Orientation respect to base frame (i.e. "base_link) -->
+
+    <group ns="$(arg camera_name_1)">
+        <include file="$(find index_recording)/launch/zed_camera_mod.launch">
+            <arg name="camera_name"         value="$(arg camera_name_1)" />
+            <arg name="node_name"           value="$(arg node_name_1)" />
+            <arg name="camera_model"        value="$(arg camera_model_1)" />
+            <arg name="publish_urdf"        value="$(arg publish_urdf)" />
+            <arg name="publish_tf"          value="true" />
+            <arg name="camera_id"           value="0" />
+        </include>
+    </group>
+
+    <!-- Recording CAMERA 1 -->
+    <include file="$(find zed2_recording)/launch/recording.launch">
+	<arg name="node_name"                      value="$(arg camera_name_1)_left_rgb_record_node" />
+  	<arg name="device_name"		           value="$(arg camera_name_1)" />
+  	<arg name="data_name"		           value="Left_RGB" />
+  	<arg name="experiment_name"		   value="$(arg experiment_name)" />
+	<arg name="camera_topic"		   value="/$(arg camera_name_1)/$(arg node_name_1)/left_raw/image_raw_color" />
+
+	<arg name="camera_info_topic"              value="/$(arg camera_name_1)/$(arg node_name_1)/left/camera_info"/> 
+        <arg name="camera_info_record"		   value="True" />
+    </include>
+
+    <include file="$(find zed2_recording)/launch/recording.launch">
+	<arg name="node_name"                      value="$(arg camera_name_1)_right_rgb_record_node" />
+  	<arg name="device_name"		           value="$(arg camera_name_1)" />
+  	<arg name="data_name"		           value="Right_RGB" />
+  	<arg name="experiment_name"		   value="$(arg experiment_name)" />
+	<arg name="camera_topic"		   value="/$(arg camera_name_1)/$(arg node_name_1)/right_raw/image_raw_color" />
+    </include>
+
+    <include file="$(find zed2_recording)/launch/recording.launch">
+	<arg name="node_name"                      value="$(arg camera_name_1)_depth_record_node" />
+  	<arg name="device_name"		           value="$(arg camera_name_1)" />
+  	<arg name="data_name"		           value="Depth" />
+  	<arg name="experiment_name"		   value="$(arg experiment_name)" />
+	<arg name="camera_topic"		   value="/$(arg camera_name_1)/$(arg node_name_1)/depth/depth_registered" />
+	<arg name="rescaling"			   value="True" />
+  	<arg name="rescaling_param_max"             default="/$(arg camera_name_1)/$(arg node_name_1)/depth/max_depth" />
+  	<arg name="rescaling_param_min"             default="/$(arg camera_name_1)/$(arg node_name_1)/depth/min_depth" />
+    </include>
+    
+
+    <!-- ZED2 CAMERA 2 -->
+    <arg name="node_name_2"          default="zed_node_B" />
+    <arg name="camera_model_2"       default="zed2" />
+    <arg name="camera_name_2"        default="zedB" />
+    <arg name="cam_pos_x_2"          default="0.0" /> <!-- Position respect to base frame (i.e. "base_link) -->
+    <arg name="cam_pos_y_2"          default="-0.28" /> <!-- Position respect to base frame (i.e. "base_link) -->
+    <arg name="cam_pos_z_2"          default="-0.04" /> <!-- Position respect to base frame (i.e. "base_link) -->
+    <arg name="cam_roll_2"           default="0.0" /> <!-- Orientation respect to base frame (i.e. "base_link) -->
+    <arg name="cam_pitch_2"          default="0.0" /> <!-- Orientation respect to base frame (i.e. "base_link) -->
+    <arg name="cam_yaw_2"            default="0.0" /> <!-- Orientation respect to base frame (i.e. "base_link) -->    
+    
+     
+    <group ns="$(arg camera_name_2)">
+        <include file="$(find index_recording)/launch/zed_camera_mod.launch">
+            <arg name="camera_name"         value="$(arg camera_name_2)" />
+            <arg name="node_name"           value="$(arg node_name_2)" />
+            <arg name="camera_model"        value="$(arg camera_model_2)" />
+            <arg name="publish_urdf"        value="true" />
+            <arg name="publish_tf"          value="false" />  Only the main camera must publish TF! 
+            <arg name="camera_id"           value="1" />
+
+            <arg name="cam_pos_x"         value="$(arg cam_pos_x_2)" />
+            <arg name="cam_pos_y"         value="$(arg cam_pos_y_2)" />
+            <arg name="cam_pos_z"         value="$(arg cam_pos_z_2)" />
+            <arg name="cam_roll"          value="$(arg cam_roll_2)" />
+            <arg name="cam_pitch"         value="$(arg cam_pitch_2)" />
+            <arg name="cam_yaw"           value="$(arg cam_yaw_2)" />
+        </include>
+    </group>
+    
+
+    <!-- Recording CAMERA 2 -->
+    <include file="$(find zed2_recording)/launch/recording.launch">
+	<arg name="node_name"                      value="$(arg camera_name_2)_left_rgb_record_node" />
+  	<arg name="device_name"		           value="$(arg camera_name_2)" />
+  	<arg name="data_name"		           value="Left_RGB" />
+  	<arg name="experiment_name"		   value="$(arg experiment_name)" />
+	<arg name="camera_topic"		   value="/$(arg camera_name_2)/$(arg node_name_2)/left_raw/image_raw_color" />
+
+	<arg name="camera_info_topic"              value="/$(arg camera_name_2)/$(arg node_name_2)/left/camera_info"/> 
+        <arg name="camera_info_record"		   value="True" />
+    </include>
+
+    <include file="$(find zed2_recording)/launch/recording.launch">
+	<arg name="node_name"                      value="$(arg camera_name_2)_right_rgb_record_node" />
+  	<arg name="device_name"		           value="$(arg camera_name_2)" />
+  	<arg name="data_name"		           value="Right_RGB" />
+  	<arg name="experiment_name"		   value="$(arg experiment_name)" />
+	<arg name="camera_topic"		   value="/$(arg camera_name_2)/$(arg node_name_2)/right_raw/image_raw_color" />
+    </include>
+
+    <include file="$(find zed2_recording)/launch/recording.launch">
+	<arg name="node_name"                      value="$(arg camera_name_2)_depth_record_node" />
+  	<arg name="device_name"		           value="$(arg camera_name_2)" />
+  	<arg name="data_name"		           value="Depth" />
+  	<arg name="experiment_name"		   value="$(arg experiment_name)" />
+	<arg name="camera_topic"		   value="/$(arg camera_name_2)/$(arg node_name_2)/depth/depth_registered" />
+	<arg name="rescaling"			   value="True" />
+  	<arg name="rescaling_param_max"             default="/$(arg camera_name_2)/$(arg node_name_2)/depth/max_depth" />
+  	<arg name="rescaling_param_min"             default="/$(arg camera_name_2)/$(arg node_name_2)/depth/min_depth" />
+    </include>
+
+
+    <!-- Kinectv2 CAMERA 3 -->
+    <arg name="camera_3_name"       default="Kinect" />    
+
+    <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
+    </include>
+
+    <!-- Recording CAMERA 3 -->
+    <include file="$(find zed2_recording)/launch/recording.launch">
+	<arg name="node_name"                      value="$(arg camera_3_name)_rgb_record_node" />
+  	<arg name="device_name"		           value="$(arg camera_3_name)" />
+  	<arg name="data_name"		           value="RGB" />
+  	<arg name="experiment_name"		   value="$(arg experiment_name)" />
+	<arg name="camera_topic"		   value="/kinect2/hd/image_color_rect" />
+        
+	<arg name="camera_info_topic"              value="/kinect2/hd/camera_info"/> 
+	<arg name="camera_info_record"		   value="True" />
+    </include>
+
+    <include file="$(find zed2_recording)/launch/recording.launch">
+	<arg name="node_name"                      value="$(arg camera_3_name)_depth_record_node" />
+  	<arg name="device_name"		           value="$(arg camera_3_name)" />
+  	<arg name="data_name"		           value="Depth" />
+  	<arg name="experiment_name"		   value="$(arg experiment_name)" />
+	<arg name="camera_topic"		   value="/kinect2/qhd/image_depth_rect" />
+    </include>
+
+
+
+    <!-- Launch rivz display -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find zed_multicamera_example)/rviz/multi_cam.rviz" output="screen" />
+
+      <!--  <include file="$(find zed2_recording)/launch/multiple_recording.launch">
+        <arg name="recording_name_A"                 value="$(arg camera_name_1)" />
+	<arg name="group_name_A"                     value="$(arg camera_name_1)/$(arg node_name_1)" />
+	<arg name="left_rgb_camera_topic_A"          value="/$(arg camera_name_1)/$(arg node_name_1)/left_raw/image_raw_color"/>
+        <arg name="right_rgb_camera_topic_A"         value="/$(arg camera_name_1)/$(arg node_name_1)/right_raw/image_raw_color"/>
+        <arg name="depth_camera_topic_A"             value="/$(arg camera_name_1)/$(arg node_name_1)/depth/depth_registered" />
+
+        <arg name="recording_name_B"                 value="$(arg camera_name_2)" />
+	<arg name="group_name_B"                     value="$(arg camera_name_2)/$(arg node_name_2)" />
+	<arg name="left_rgb_camera_topic_B"          value="/$(arg camera_name_2)/$(arg node_name_2)/left_raw/image_raw_color"/>
+        <arg name="right_rgb_camera_topic_B"         value="/$(arg camera_name_2)/$(arg node_name_2)/right_raw/image_raw_color"/>
+        <arg name="depth_camera_topic_B"             value="/$(arg camera_name_2)/$(arg node_name_2)/depth/depth_registered" />
+		
+    </include> -->
+</launch>
